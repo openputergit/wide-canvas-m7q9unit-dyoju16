@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SME Financial Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <nav class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 p-4">
+            <div class="flex items-center mb-8">
+                <i class="bi bi-wallet-fill text-blue-600 text-2xl"></i>
+                <h1 class="ml-2 text-xl font-bold">FinancePro</h1>
+            </div>
+            <div class="space-y-2">
+                <a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100">
+                    <i class="bi bi-house-door mr-3"></i>Dashboard
+                </a>
+                <a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100">
+                    <i class="bi bi-cash-coin mr-3"></i>Transactions
+                </a>
+                <a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100">
+                    <i class="bi bi-pie-chart mr-3"></i>Budget
+                </a>
+                <a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100">
+                    <i class="bi bi-bell mr-3"></i>Notifications
+                </a>
+                <a href="#" class="flex items-center p-2 text-gray-700 rounded hover:bg-gray-100">
+                    <i class="bi bi-gear mr-3"></i>Settings
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white border-b border-gray-200 p-4">
+                <div class="flex justify-between items-center">
+                    <button class="md:hidden text-gray-600">
+                        <i class="bi bi-list text-2xl"></i>
+                    </button>
+                    <div class="flex items-center space-x-4">
+                        <button class="bg-gray-100 p-2 rounded-full">
+                            <i class="bi bi-bell text-gray-600"></i>
+                        </button>
+                        <select id="currency-selector" class="bg-gray-100 p-2 rounded-lg">
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="flex-1 overflow-y-auto p-4">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-gray-500">Total Revenue</h3>
+                        <p class="text-2xl font-bold">$124,750.50</p>
+                        <span class="text-green-500 text-sm"><i class="bi bi-arrow-up"></i> 12% vs last month</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-gray-500">Total Expenses</h3>
+                        <p class="text-2xl font-bold">$86,320.25</p>
+                        <span class="text-red-500 text-sm"><i class="bi bi-arrow-down"></i> 5% vs last month</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-gray-500">Net Profit</h3>
+                        <p class="text-2xl font-bold">$38,430.25</p>
+                        <span class="text-green-500 text-sm"><i class="bi bi-arrow-up"></i> 8% vs last month</span>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-gray-500">Budget Status</h3>
+                        <p class="text-2xl font-bold">75%</p>
+                        <span class="text-blue-500 text-sm">On track</span>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Revenue vs Expenses</h3>
+                        <canvas id="revenueExpensesChart"></canvas>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold mb-4">Expense Categories</h3>
+                        <canvas id="expenseCategoriesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="bg-white rounded-lg shadow p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold">Recent Transactions</h3>
+                        <button id="exportBtn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            Export Data
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left bg-gray-50">
+                                    <th class="p-3">Date</th>
+                                    <th class="p-3">Description</th>
+                                    <th class="p-3">Category</th>
+                                    <th class="p-3">Amount</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Sample transaction data
+        const transactions = [
+            { date: '2023-11-20', description: 'Office Supplies', category: 'Expenses', amount: -1250.00, status: 'Completed' },
+            { date: '2023-11-19', description: 'Client Payment', category: 'Income', amount: 5000.00, status: 'Completed' },
+            { date: '2023-11-18', description: 'Utility Bills', category: 'Expenses', amount: -450.00, status: 'Pending' },
+            { date: '2023-11-17', description: 'Software License', category: 'Expenses', amount: -799.99, status: 'Completed' },
+        ];
+
+        // Populate transaction table
+        const transactionTable = document.getElementById('transactionTable');
+        transactions.forEach(transaction => {
+            const row = document.createElement('tr');
+            row.className = 'border-t';
+            row.innerHTML = `
+                <td class="p-3">${transaction.date}</td>
+                <td class="p-3">${transaction.description}</td>
+                <td class="p-3">${transaction.category}</td>
+                <td class="p-3 ${transaction.amount >= 0 ? 'text-green-500' : 'text-red-500'}">
+                    ${transaction.amount >= 0 ? '+' : ''}$${Math.abs(transaction.amount).toFixed(2)}
+                </td>
+                <td class="p-3">
+                    <span class="px-2 py-1 rounded-full text-sm ${
+                        transaction.status === 'Completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    }">${transaction.status}</span>
+                </td>
+            `;
+            transactionTable.appendChild(row);
+        });
+
+        // Revenue vs Expenses Chart
+        const revenueExpensesCtx = document.getElementById('revenueExpensesChart').getContext('2d');
+        new Chart(revenueExpensesCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [65000, 59000, 80000, 81000, 56000, 95000],
+                    borderColor: 'rgb(34, 197, 94)',
+                    tension: 0.1
+                }, {
+                    label: 'Expenses',
+                    data: [45000, 49000, 60000, 71000, 46000, 75000],
+                    borderColor: 'rgb(239, 68, 68)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Expense Categories Chart
+        const expenseCategoriesCtx = document.getElementById('expenseCategoriesChart').getContext('2d');
+        new Chart(expenseCategoriesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Supplies', 'Utilities', 'Rent', 'Payroll', 'Marketing'],
+                datasets: [{
+                    data: [15, 10, 30, 35, 10],
+                    backgroundColor: [
+                        '#60A5FA',
+                        '#34D399',
+                        '#F87171',
+                        '#818CF8',
+                        '#FBBF24'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+
+        // Export functionality
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "Date,Description,Category,Amount,Status\n"
+                + transactions.map(row => {
+                    return `${row.date},${row.description},${row.category},${row.amount},${row.status}`;
+                }).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "transactions.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Currency selector functionality
+        document.getElementById('currency-selector').addEventListener('change', (e) => {
+            // In a real application, this would trigger an API call to convert all amounts
+            console.log(`Currency changed to ${e.target.value}`);
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
